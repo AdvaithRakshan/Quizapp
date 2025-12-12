@@ -30,33 +30,45 @@ export default function ResultPage() {
   const startRef = useRef<number | null>(null)
 
   useEffect(() => {
-    if (rafRef.current) cancelAnimationFrame(rafRef.current)
-    startRef.current = null
-    setDisplayScore(0)
+  // Cancel any existing animation
+  if (rafRef.current !== null) {
+    cancelAnimationFrame(rafRef.current);
+  }
 
-    const duration = 1400
-    const startValue = 0
-    const endValue = finalScore
+  startRef.current = null;
+  setDisplayScore(0);
 
-    function step(timestamp: number) {
-      if (startRef.current === null) startRef.current = timestamp
-      const progress = Math.min(1, (timestamp - startRef.current) / duration)
-      const eased = 1 - Math.pow(1 - progress, 3)
-      const current = Math.round(startValue + (endValue - startValue) * eased)
+  const duration = 1400;
+  const startValue = 0;
+  const endValue = finalScore;
 
-      setDisplayScore(current)
+  function step(timestamp: number) {
+    if (startRef.current === null) startRef.current = timestamp;
 
-      if (progress < 1) {
-        rafRef.current = requestAnimationFrame(step)
-      } else {
-        setDisplayScore(endValue)
-        rafRef.current = null
-      }
+    const progress = Math.min(1, (timestamp - startRef.current) / duration);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(startValue + (endValue - startValue) * eased);
+
+    setDisplayScore(current);
+
+    if (progress < 1) {
+      rafRef.current = requestAnimationFrame(step);
+    } else {
+      rafRef.current = null;
+      setDisplayScore(endValue);
     }
+  }
 
-    rafRef.current = requestAnimationFrame(step)
-    return () => rafRef.current && cancelAnimationFrame(rafRef.current)
-  }, [finalScore])
+  rafRef.current = requestAnimationFrame(step);
+
+  // CLEANUP FUNCTION
+  return () => {
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+    }
+  };
+}, [finalScore]);
+
 
   return (
     <div
