@@ -1,4 +1,4 @@
-import { HiChevronLeft, HiChevronRight } from "react-icons/hi2"
+import { HiChevronLeft, HiChevronRight } from "react-icons/hi"
 
 
 interface Props {
